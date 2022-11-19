@@ -1,0 +1,13 @@
+:root {
+    --brand-color: #ff922b;
+    --complementary-color: #2997FF;
+}
+
+.brand-color {
+    color: var(--brand-color);
+}
+
+.brand-bg-color {
+    background-color: var(--brand-color);
+    color: var(--complementary-color);
+}
