@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+{% block load_lib %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'directs/css/style.css' %}">
+{% endblock load_lib %}
+{% block content %}
+    <div class="container clearfix">
+        <div class="people-list" id="people-list">
+            <div class="search">
+                {% comment %} <input type="text" placeholder="search" />
+                <i class="fa fa-search"></i> {% endcomment %}
+                <a href="{% url 'search-users' %}"
+                   class="btn btn-secondary mt-4 mb-4"
+                   style="display:block">New Message</a>
+            </div>
+            <ul class="list">
+                {% for message in messages %}
+                    <li class="clearfix">
+                        <a href="{% url 'directs' message.user.username %}"
+                           class="list-group-item list-group-item-action border-0 {% if active_direct == message.user.username %}active{% endif %}">
+                            <div class="badge bg-success float-right"></div>
+                            {% comment %} <div class="d-flex align-items-start pb-2">
+                                <img src="{{ message.user.profile.image.url }}" class="rounded-circle mr-2" alt="img" width="40" height="40">
+                                <div class="flex-grow-1">
+                                    <b>{{ message.user.profile.first_name }} {{ message.user.profile.last_name }}</b>
+                                    <div class="small">
+                                        <span class="fas fa-circle chat-online"></span> @{{ message.user.username }}
+                                    </div>
+                                </div>
+                            </div> {% endcomment %}
+                            {% comment %} <div class="container pb-2"> {% endcomment %}
+                            <div class="row">
+                                <div class="col-md-3 col-sm-10">
+                                    <img src="{{ message.user.profile.image.url }}"
+                                         class="rounded-circle mr-2"
+                                         alt="img"
+                                         width="40"
+                                         height="40">
+                                </div>
+                                <div class="col">
+                                    <b>{{ message.user.profile.first_name }} {{ message.user.profile.last_name }}</b>
+                                    <div class="small">
+                                        <span class="fas fa-circle chat-online"></span> @{{ message.user.username }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% comment %} </div> {% endcomment %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="chat">
+            {% comment %} <div class="chat-header clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-with">Chat with {{ message.user.username }}</div>
+                    <div class="chat-num-messages">already 1 902 messages</div>
+                </div>
+                <i class="fa fa-star"></i>
+            </div> {% endcomment %}
+            <!-- end chat-header -->
+            <div class="chat-history" style="overflow-y:scroll;">
+                <ul>
+                    {% for direct in directs %}
+                        {% if direct.sender == request.user %}
+                            <li class="clearfix">
+                                <div class="message-data align-right">
+                                    <span class="message-data-name">{{ direct.sender }}</span><i class="fa fa-circle me"></i>
+                                    <br>
+                                    <span class="message-data-time">{{ direct.date|date:"h:i A, D, M, Y" }}</span> &nbsp; &nbsp;
+                                </div>
+                                <div class="message other-message float-right">{{ direct.body }}</div>
+                            </li>
+                        {% else %}
+                            <li>
+                                <span class="message-data-name"><i class="fa fa-circle online"></i> {{ direct.sender }}</span>
+                                <div class="message-data">
+                                    <span class="message-data-time">{{ direct.date|date:"h:i A, D, M, Y" }}</span> &nbsp; &nbsp;
+                                </div>
+                                <div class="message my-message">{{ direct.body }}</div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% comment %}  {% endcomment %}
+                </ul>
+            </div>
+            <!-- end chat-history -->
+            <div class="chat-message clearfix">
+                <form method="post" action="{% url 'send-directs' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="to_user" value="{{ active_direct }}">
+                    <input name="body"
+                           id="message-to-send"
+                           placeholder="Type your message"
+                           class="form-control">
+                    <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-file-image-o"></i>
+                    <button type="submit" class="send-button">Send</button>
+                </form>
+            </div>
+            <!-- end chat-message -->
+        </div>
+        <!-- end chat -->
+    </div>
+    <!-- end container -->
+    <script id="message-template" type="text/x-handlebars-template">
+  <li class="clearfix">
+    <div class="message-data align-right">
+      <span class="message-data-time">{{time}}, Today</span> &nbsp; &nbsp;
+      <span class="message-data-name">Olia</span> <i class="fa fa-circle me"></i>
+    </div>
+    <div class="message other-message float-right">{{messageOutput}}</div>
+  </li>
+    </script>
+    <script id="message-response-template" type="text/x-handlebars-template">
+  <li>
+    <div class="message-data">
+      <span class="message-data-name"><i class="fa fa-circle online"></i> Vincent</span>
+      <span class="message-data-time">{{time}}, Today</span>
+    </div>
+    <div class="message my-message">{{response}}</div>
+  </li>
+    </script>
+{% endblock content %}
